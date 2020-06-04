@@ -58,19 +58,35 @@
             return new Node(this.ExpectNumber());
         }
 
+        public Node Unary()
+        {
+            if (this.Consume('+'))
+            {
+                return this.Primary();
+            }
+            else if (this.Consume('-'))
+            {
+                return new Node(NodeKind.Sub, new Node(0), this.Primary());
+            }
+            else
+            {
+                return this.Primary();
+            }
+        }
+
         public Node Mul()
         {
-            var node = this.Primary();
+            var node = this.Unary();
 
             for (; ; )
             {
                 if (this.Consume('*'))
                 {
-                    node = new Node(NodeKind.Mul, node, this.Primary());
+                    node = new Node(NodeKind.Mul, node, this.Unary());
                 }
                 else if (this.Consume('/'))
                 {
-                    node = new Node(NodeKind.Div, node, this.Primary());
+                    node = new Node(NodeKind.Div, node, this.Unary());
                 }
                 else
                 {
