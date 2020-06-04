@@ -38,7 +38,7 @@
                     continue;
                 }
 
-                if (c == '+' || c == '-')
+                if (c == '+' || c == '-' || c == '*' || c == '/' || c == '(' || c == ')')
                 {
                     current = Token.NewToken(TokenKind.Reserved, current, c);
                     continue;

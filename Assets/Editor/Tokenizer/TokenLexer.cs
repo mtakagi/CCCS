@@ -81,7 +81,7 @@
 
         public Node Expr()
         {
-            var node = this.Primary();
+            var node = this.Mul();
 
             for (; ; )
             {

@@ -19,5 +19,42 @@
             this.Kind = NodeKind.Nunber;
             this.IntValue = value;
         }
+
+        override public string ToString()
+        {
+            if (this.Kind == NodeKind.Nunber)
+            {
+                return $"Kind: Number {this.IntValue}\n";
+            }
+            var sb = new System.Text.StringBuilder();
+
+            if (this.Lhs != null)
+            {
+                sb.Append(this.Lhs.ToString());
+            }
+
+            if (this.Rhs != null)
+            {
+                sb.Append(this.Rhs.ToString());
+            }
+
+            switch (this.Kind)
+            {
+                case NodeKind.Add:
+                    sb.Append("Kind: Add\n");
+                    break;
+                case NodeKind.Sub:
+                    sb.Append("Kind: Sub\n");
+                    break;
+                case NodeKind.Mul:
+                    sb.Append("Kind: Mul\n");
+                    break;
+                case NodeKind.Div:
+                    sb.Append("Kind: Div\n");
+                    break;
+            }
+
+            return sb.ToString();
+        }
     }
 }
