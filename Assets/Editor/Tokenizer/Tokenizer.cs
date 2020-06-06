@@ -40,20 +40,22 @@
 
                 if (c == '+' || c == '-' || c == '*' || c == '/' || c == '(' || c == ')')
                 {
-                    current = Token.NewToken(TokenKind.Reserved, current, c);
+                    current = Token.NewToken(TokenKind.Reserved, current, c.ToString());
                     continue;
                 }
 
                 if (char.IsDigit(c))
                 {
+                    var start = i;
                     var val = Tokenizer.StrtoL(str, ref i);
+                    var s = str.Substring(start, i - start);
                     i--;
-                    current = Token.NewToken(TokenKind.Number, current, c);
+                    current = Token.NewToken(TokenKind.Number, current, c.ToString());
                     current.IntValue = val;
                 }
             }
 
-            Token.NewToken(TokenKind.EOF, current, '\0');
+            Token.NewToken(TokenKind.EOF, current, "\0");
 
             return head.Next;
         }

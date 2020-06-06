@@ -7,9 +7,11 @@ namespace CCCS
         public TokenKind Kind { get; private set; }
         public Token Next { get; private set; }
         public int IntValue { get; internal set; }
-        public char StrValue { get; internal set; }
+        public string StrValue { get; internal set; }
 
-        private Token(TokenKind kind, char str)
+        public int Length { get; private set; }
+
+        private Token(TokenKind kind, string str)
         {
             this.Kind = kind;
             this.StrValue = str;
@@ -19,10 +21,10 @@ namespace CCCS
 
         public static Token NewToken()
         {
-            return new Token(TokenKind.NOP, '\0');
+            return new Token(TokenKind.NOP, "\0");
         }
 
-        public static Token NewToken(TokenKind kind, Token current, char str)
+        public static Token NewToken(TokenKind kind, Token current, string str)
         {
             var token = new Token(kind, str);
             current.Next = token;

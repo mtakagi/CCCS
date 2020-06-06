@@ -16,7 +16,7 @@ public class TokenTest
     public static void Test()
     {
         var path = Path.GetTempPath();
-        var asm = Compile("-1+2*3-4");
+        var asm = Compile("10+2*3-4");
 
         File.WriteAllText(Path.Combine(path, "test.s"), asm, Encoding.UTF8);
 

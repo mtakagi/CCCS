@@ -9,7 +9,7 @@
             this.token = token;
         }
 
-        public bool Consume(char op)
+        public bool Consume(string op)
         {
             if (token.Kind != TokenKind.Reserved || op != token.StrValue)
             {
@@ -20,7 +20,7 @@
             return true;
         }
 
-        public void Expect(char op)
+        public void Expect(string op)
         {
             if (token.Kind != TokenKind.Reserved || op != token.StrValue)
             {
@@ -47,10 +47,10 @@
 
         public Node Primary()
         {
-            if (this.Consume('('))
+            if (this.Consume("("))
             {
                 var node = this.Expr();
-                this.Expect(')');
+                this.Expect(")");
 
                 return node;
             }
@@ -60,11 +60,11 @@
 
         public Node Unary()
         {
-            if (this.Consume('+'))
+            if (this.Consume("+"))
             {
                 return this.Primary();
             }
-            else if (this.Consume('-'))
+            else if (this.Consume("-"))
             {
                 return new Node(NodeKind.Sub, new Node(0), this.Primary());
             }
@@ -80,11 +80,11 @@
 
             for (; ; )
             {
-                if (this.Consume('*'))
+                if (this.Consume("*"))
                 {
                     node = new Node(NodeKind.Mul, node, this.Unary());
                 }
-                else if (this.Consume('/'))
+                else if (this.Consume("/"))
                 {
                     node = new Node(NodeKind.Div, node, this.Unary());
                 }
@@ -101,11 +101,11 @@
 
             for (; ; )
             {
-                if (this.Consume('+'))
+                if (this.Consume("+"))
                 {
                     node = new Node(NodeKind.Add, node, this.Mul());
                 }
-                else if (this.Consume('-'))
+                else if (this.Consume("-"))
                 {
                     node = new Node(NodeKind.Sub, node, this.Mul());
                 }
