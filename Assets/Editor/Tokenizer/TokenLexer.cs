@@ -11,7 +11,8 @@
 
         public bool Consume(string op)
         {
-            if (token.Kind != TokenKind.Reserved || op != token.StrValue)
+            if (token.Kind != TokenKind.Reserved || op != token.StrValue
+            || op.Length != token.Length || op != token.StrValue)
             {
                 return false;
             }
@@ -22,7 +23,8 @@
 
         public void Expect(string op)
         {
-            if (token.Kind != TokenKind.Reserved || op != token.StrValue)
+            if (token.Kind != TokenKind.Reserved || op != token.StrValue
+            || op.Length != token.Length || op != token.StrValue)
             {
                 throw new System.Exception();
             }
@@ -45,32 +47,79 @@
 
         public bool IsEOF() => token.IsEOF();
 
-        public Node Primary()
+        public Node Expr()
         {
-            if (this.Consume("("))
-            {
-                var node = this.Expr();
-                this.Expect(")");
-
-                return node;
-            }
-
-            return new Node(this.ExpectNumber());
+            return this.Equality();
         }
 
-        public Node Unary()
+        public Node Equality()
         {
-            if (this.Consume("+"))
+            var node = this.Relational();
+
+            for (; ; )
             {
-                return this.Primary();
+                if (this.Consume("=="))
+                {
+                    node = new Node(NodeKind.Equal, node, this.Relational());
+                }
+                else if (this.Consume("!="))
+                {
+                    node = new Node(NodeKind.NotEqual, node, this.Relational());
+                }
+                else
+                {
+                    return node;
+                }
             }
-            else if (this.Consume("-"))
+        }
+
+        public Node Relational()
+        {
+            var node = this.Add();
+
+            for (; ; )
             {
-                return new Node(NodeKind.Sub, new Node(0), this.Primary());
+                if (this.Consume("<"))
+                {
+                    node = new Node(NodeKind.LesserThan, node, this.Add());
+                }
+                else if (this.Consume("<="))
+                {
+                    node = new Node(NodeKind.LesserThanOrEqual, node, this.Add());
+                }
+                else if (this.Consume(">"))
+                {
+                    node = new Node(NodeKind.LesserThan, this.Add(), node);
+                }
+                else if (this.Consume(">="))
+                {
+                    node = new Node(NodeKind.LesserThanOrEqual, this.Add(), node);
+                }
+                else
+                {
+                    return node;
+                }
             }
-            else
+        }
+
+        public Node Add()
+        {
+            var node = this.Mul();
+
+            for (; ; )
             {
-                return this.Primary();
+                if (this.Consume("+"))
+                {
+                    node = new Node(NodeKind.Add, node, this.Mul());
+                }
+                else if (this.Consume("-"))
+                {
+                    node = new Node(NodeKind.Sub, node, this.Mul());
+                }
+                else
+                {
+                    return node;
+                }
             }
         }
 
@@ -95,25 +144,33 @@
             }
         }
 
-        public Node Expr()
+        public Node Unary()
         {
-            var node = this.Mul();
-
-            for (; ; )
+            if (this.Consume("+"))
             {
-                if (this.Consume("+"))
-                {
-                    node = new Node(NodeKind.Add, node, this.Mul());
-                }
-                else if (this.Consume("-"))
-                {
-                    node = new Node(NodeKind.Sub, node, this.Mul());
-                }
-                else
-                {
-                    return node;
-                }
+                return this.Primary();
             }
+            else if (this.Consume("-"))
+            {
+                return new Node(NodeKind.Sub, new Node(0), this.Primary());
+            }
+            else
+            {
+                return this.Primary();
+            }
+        }
+
+        public Node Primary()
+        {
+            if (this.Consume("("))
+            {
+                var node = this.Expr();
+                this.Expect(")");
+
+                return node;
+            }
+
+            return new Node(this.ExpectNumber());
         }
 
         public string CodeGen(Node node)
@@ -145,6 +202,26 @@
                 case NodeKind.Div:
                     sb.Append("  cqo\n");
                     sb.Append("  idiv rdi\n");
+                    break;
+                case NodeKind.Equal:
+                    sb.Append("  cmp rax, rdi\n");
+                    sb.Append("  sete al\n");
+                    sb.Append("  movzx rax, al\n");
+                    break;
+                case NodeKind.NotEqual:
+                    sb.Append("  cmp rax, rdi\n");
+                    sb.Append("  setne al\n");
+                    sb.Append("  movzx rax, al\n");
+                    break;
+                case NodeKind.LesserThan:
+                    sb.Append("  cmp rax, rdi\n");
+                    sb.Append("  setl al\n");
+                    sb.Append("  movzx rax, al\n");
+                    break;
+                case NodeKind.LesserThanOrEqual:
+                    sb.Append("  cmp rax, rdi\n");
+                    sb.Append("  setle al\n");
+                    sb.Append("  movzx rax, al\n");
                     break;
             }
 

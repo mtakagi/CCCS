@@ -15,6 +15,7 @@ namespace CCCS
         {
             this.Kind = kind;
             this.StrValue = str;
+            this.Length = str.Length;
         }
 
         public bool IsEOF() => this.Kind == TokenKind.EOF;

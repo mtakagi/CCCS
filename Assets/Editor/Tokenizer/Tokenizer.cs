@@ -38,7 +38,18 @@
                     continue;
                 }
 
-                if (c == '+' || c == '-' || c == '*' || c == '/' || c == '(' || c == ')')
+                if (c == '=' || c == '!' || c == '>' || c == '<')
+                {
+                    var c2 = str[i + 1];
+                    if (c2 == '=' || c2 == '>' || c2 == '<')
+                    {
+                        current = Token.NewToken(TokenKind.Reserved, current, $"{c}{c2}");
+                        i++;
+                        continue;
+                    }
+                }
+
+                if (c == '+' || c == '-' || c == '*' || c == '/' || c == '(' || c == ')' || c == '<' || c == '>')
                 {
                     current = Token.NewToken(TokenKind.Reserved, current, c.ToString());
                     continue;

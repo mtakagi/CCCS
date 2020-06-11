@@ -52,6 +52,18 @@
                 case NodeKind.Div:
                     sb.Append("Kind: Div\n");
                     break;
+                case NodeKind.Equal:
+                    sb.Append("Kind: Equal\n");
+                    break;
+                case NodeKind.NotEqual:
+                    sb.Append("Kind: NotEqual\n");
+                    break;
+                case NodeKind.LesserThan:
+                    sb.Append("Kind: LesserThan\n");
+                    break;
+                case NodeKind.LesserThanOrEqual:
+                    sb.Append("Kind: LesserThanOrEqual\n");
+                    break;
             }
 
             return sb.ToString();

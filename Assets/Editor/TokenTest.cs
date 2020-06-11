@@ -16,8 +16,7 @@ public class TokenTest
     public static void Test()
     {
         var path = Path.GetTempPath();
-        var asm = Compile("10+2*3-4");
-
+        var asm = Compile("2!=1");
         File.WriteAllText(Path.Combine(path, "test.s"), asm, Encoding.UTF8);
 
         var info = new ProcessStartInfo("cc", $"-o {OutputExeFileName} {OutputFileName}");

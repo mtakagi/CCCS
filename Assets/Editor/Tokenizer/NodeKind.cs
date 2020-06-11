@@ -6,6 +6,10 @@
         Sub,
         Mul,
         Div,
+        Equal,
+        NotEqual,
+        LesserThan,
+        LesserThanOrEqual,
         Nunber
     }
 }
