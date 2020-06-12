@@ -80,6 +80,12 @@ public class CCCSTest
         AssertEqual(3, "1;2;3;");
     }
 
+    [Test]
+    public void テスト代入()
+    {
+        AssertEqual(3, "a=3;");
+    }
+
     private void AssertEqual(int expect, string code)
     {
         var path = Write(Compiler.Compile(code));

@@ -49,7 +49,7 @@
                     }
                 }
 
-                if (c == '+' || c == '-' || c == '*' || c == '/' || c == '(' || c == ')' || c == '<' || c == '>' || c == ';')
+                if (c == '+' || c == '-' || c == '*' || c == '/' || c == '(' || c == ')' || c == '<' || c == '>' || c == ';' || c == '=')
                 {
                     current = Token.NewToken(TokenKind.Reserved, current, c.ToString());
                     continue;
