@@ -49,9 +49,15 @@
                     }
                 }
 
-                if (c == '+' || c == '-' || c == '*' || c == '/' || c == '(' || c == ')' || c == '<' || c == '>')
+                if (c == '+' || c == '-' || c == '*' || c == '/' || c == '(' || c == ')' || c == '<' || c == '>' || c == ';')
                 {
                     current = Token.NewToken(TokenKind.Reserved, current, c.ToString());
+                    continue;
+                }
+
+                if ('a' <= c && c <= 'z')
+                {
+                    current = Token.NewToken(TokenKind.Identifier, current, c.ToString());
                     continue;
                 }
 

@@ -9,15 +9,26 @@ namespace CCCS
             var tokenizer = new CCCS.Tokenizer(str);
             var token = tokenizer.Tokenize();
             var lexer = new CCCS.TokenLexer(token);
-            var node = lexer.Expr();
             var sb = new StringBuilder();
+
+            lexer.Program();
 
             sb.Append(".intel_syntax noprefix\n");
             sb.Append(".globl _main\n");
             sb.Append("_main:\n");
 
-            sb.Append(lexer.CodeGen(node));
-            sb.Append("  pop rax\n");
+            sb.Append("  push rbp\n");
+            sb.Append("  mov rbp, rsp\n");
+            sb.Append("  sub rsp, 208\n");
+
+            foreach (var node in lexer.Code)
+            {
+                sb.Append(CodeGenerator.CodeGen(node));
+                sb.Append("  pop rax\n");
+            }
+
+            sb.Append("  mov rsp, rbp\n");
+            sb.Append("  pop rbp\n");
             sb.Append("  ret\n");
 
             return sb.ToString();

@@ -6,6 +6,8 @@
         Sub,
         Mul,
         Div,
+        Assign,
+        LeftVariable,
         Equal,
         NotEqual,
         LesserThan,

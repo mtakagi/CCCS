@@ -4,6 +4,7 @@
     {
         NOP,
         Reserved,
+        Identifier,
         Number,
         EOF
     }

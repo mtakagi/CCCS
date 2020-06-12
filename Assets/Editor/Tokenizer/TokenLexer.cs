@@ -1,12 +1,16 @@
-﻿namespace CCCS
+﻿using System.Collections.Generic;
+
+namespace CCCS
 {
     public class TokenLexer
     {
         private Token token;
+        public List<Node> Code { get; private set; }
 
         public TokenLexer(Token token)
         {
             this.token = token;
+            this.Code = new List<Node>();
         }
 
         public bool Consume(string op)
@@ -19,6 +23,20 @@
             token = token.Next;
 
             return true;
+        }
+
+        public Token ConsumeIdentifier()
+        {
+            if (token.Kind != TokenKind.Identifier)
+            {
+                return null;
+            }
+
+            var result = token;
+
+            token = token.Next;
+
+            return result;
         }
 
         public void Expect(string op)
@@ -47,9 +65,37 @@
 
         public bool IsEOF() => token.IsEOF();
 
+        public void Program()
+        {
+            while (!this.IsEOF())
+            {
+                this.Code.Add(Statement());
+            }
+        }
+
+        public Node Statement()
+        {
+            var node = this.Expr();
+            Expect(";");
+
+            return node;
+        }
+
         public Node Expr()
         {
-            return this.Equality();
+            return this.Assign();
+        }
+
+        public Node Assign()
+        {
+            var node = this.Equality();
+
+            if (this.Consume("="))
+            {
+                node = new Node(NodeKind.Assign, node, this.Assign());
+            }
+
+            return node;
         }
 
         public Node Equality()
@@ -170,64 +216,16 @@
                 return node;
             }
 
+            var token = this.ConsumeIdentifier();
+
+            if (token != null)
+            {
+                var node = new Node((token.StrValue[0] - 'a' + 1) * 8, NodeKind.LeftVariable);
+
+                return node;
+            }
+
             return new Node(this.ExpectNumber());
-        }
-
-        public string CodeGen(Node node)
-        {
-            if (node.Kind == NodeKind.Nunber)
-            {
-                return $"  push {node.IntValue}\n";
-            }
-
-            var sb = new System.Text.StringBuilder();
-
-            sb.Append(this.CodeGen(node.Lhs));
-            sb.Append(this.CodeGen(node.Rhs));
-
-            sb.Append("  pop rdi\n");
-            sb.Append("  pop rax\n");
-
-            switch (node.Kind)
-            {
-                case NodeKind.Add:
-                    sb.Append("  add rax, rdi\n");
-                    break;
-                case NodeKind.Sub:
-                    sb.Append("  sub rax, rdi\n");
-                    break;
-                case NodeKind.Mul:
-                    sb.Append("  imul rax, rdi\n");
-                    break;
-                case NodeKind.Div:
-                    sb.Append("  cqo\n");
-                    sb.Append("  idiv rdi\n");
-                    break;
-                case NodeKind.Equal:
-                    sb.Append("  cmp rax, rdi\n");
-                    sb.Append("  sete al\n");
-                    sb.Append("  movzx rax, al\n");
-                    break;
-                case NodeKind.NotEqual:
-                    sb.Append("  cmp rax, rdi\n");
-                    sb.Append("  setne al\n");
-                    sb.Append("  movzx rax, al\n");
-                    break;
-                case NodeKind.LesserThan:
-                    sb.Append("  cmp rax, rdi\n");
-                    sb.Append("  setl al\n");
-                    sb.Append("  movzx rax, al\n");
-                    break;
-                case NodeKind.LesserThanOrEqual:
-                    sb.Append("  cmp rax, rdi\n");
-                    sb.Append("  setle al\n");
-                    sb.Append("  movzx rax, al\n");
-                    break;
-            }
-
-            sb.Append("  push rax\n");
-
-            return sb.ToString();
         }
     }
 }

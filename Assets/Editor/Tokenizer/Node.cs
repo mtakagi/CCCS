@@ -6,6 +6,7 @@
         public Node Lhs { get; private set; }
         public Node Rhs { get; private set; }
         public int IntValue { get; private set; }
+        public int Offset { get; private set; }
 
         public Node(NodeKind kind, Node lhs, Node rhs)
         {
@@ -18,6 +19,12 @@
         {
             this.Kind = NodeKind.Nunber;
             this.IntValue = value;
+        }
+
+        public Node(int offset, NodeKind kind = NodeKind.LeftVariable)
+        {
+            this.Kind = kind;
+            this.Offset = offset;
         }
 
         override public string ToString()
