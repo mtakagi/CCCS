@@ -21,6 +21,7 @@
 
 # Visual Studio cache directory
 .vs/
+.vscode/
 
 # Gradle cache directory
 .gradle/
@@ -58,3 +59,14 @@ sysinfo.txt
 # Crashlytics generated file
 crashlytics-build.properties
 
+# Builds
+*.apk
+*.ipa
+
+# Hidden Files
+.DS_Store
+Thumbs.db
+
+# sed processed c# source file
+*.cs-e
+*.cs-e.meta
