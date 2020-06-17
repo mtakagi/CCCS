@@ -84,6 +84,7 @@ public class CCCSTest
     public void テスト代入()
     {
         AssertEqual(3, "a=3;");
+        AssertEqual(2, "ab=2;");
     }
 
     private void AssertEqual(int expect, string code)
