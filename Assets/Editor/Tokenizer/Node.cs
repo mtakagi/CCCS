@@ -6,7 +6,7 @@
         public Node Lhs { get; private set; }
         public Node Rhs { get; private set; }
         public int IntValue { get; private set; }
-        public int Offset { get; private set; }
+        public int Offset { get; internal set; }
 
         public Node(NodeKind kind, Node lhs, Node rhs)
         {

@@ -87,6 +87,14 @@ public class CCCSTest
         AssertEqual(2, "ab=2;");
     }
 
+    [Test]
+    public void テスト複数変数()
+    {
+        AssertEqual(3, "foo=2;bar=1;foo+bar;");
+        AssertEqual(3, "foo=4;bar=2;(foo+bar)/2;");
+        AssertEqual(3, "foo=1;bar=2;foo=4;(foo+bar)/2;");
+    }
+
     private void AssertEqual(int expect, string code)
     {
         var path = Write(Compiler.Compile(code));

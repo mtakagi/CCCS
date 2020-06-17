@@ -1,4 +1,5 @@
 ﻿using System.Collections.Generic;
+using System.Linq;
 
 namespace CCCS
 {
@@ -6,10 +7,13 @@ namespace CCCS
     {
         private TokenLexer lexer;
         public List<Node> Code { get; private set; }
+        public List<LocalVariable> Locals { get; private set; }
+
         public Parser(TokenLexer lexer)
         {
             this.lexer = lexer;
             this.Code = new List<Node>();
+            this.Locals = new List<LocalVariable>();
         }
 
         public void Program()
@@ -40,6 +44,20 @@ namespace CCCS
             if (this.lexer.Consume("="))
             {
                 node = new Node(NodeKind.Assign, node, this.Assign());
+
+                var local = this.Locals.Find(obj => obj.Name == this.lexer.token.StrValue);
+
+                if (local != null)
+                {
+                    node.Offset = local.Offset;
+                }
+                else
+                {
+                    var offset = this.Locals.Count != 0 ? this.Locals.Last().Offset : 8;
+                    local = new LocalVariable(this.lexer.token.StrValue, offset);
+                    node.Offset = local.Offset;
+                    this.Locals.Add(local);
+                }
             }
 
             return node;

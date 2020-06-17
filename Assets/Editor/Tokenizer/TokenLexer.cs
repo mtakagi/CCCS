@@ -1,10 +1,10 @@
-﻿using System.Collections.Generic;
+using System.Collections.Generic;
 
 namespace CCCS
 {
     public class TokenLexer
     {
-        private Token token;
+        public Token token { get; private set; }
 
         public TokenLexer(Token token)
         {
