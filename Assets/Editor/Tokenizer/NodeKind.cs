@@ -12,6 +12,7 @@
         NotEqual,
         LesserThan,
         LesserThanOrEqual,
-        Nunber
+        Nunber,
+        Return
     }
 }

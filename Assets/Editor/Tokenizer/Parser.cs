@@ -26,7 +26,17 @@ namespace CCCS
 
         public Node Statement()
         {
-            var node = this.Expr();
+            Node node = null;
+
+            if (this.lexer.Consume("return"))
+            {
+                node = new Node(NodeKind.Return, this.Expr(), null);
+            }
+            else
+            {
+
+                node = this.Expr();
+            }
             this.lexer.Expect(";");
 
             return node;

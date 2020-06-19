@@ -76,7 +76,15 @@
                         current = Token.NewToken(TokenKind.Reserved, current, c.ToString());
                         continue;
                     case char letter when this.IsLetter(c):
-                        current = Token.NewToken(TokenKind.Identifier, current, this.Name(ref i));
+                        if (this.IsReturn(i))
+                        {
+                            current = Token.NewToken(TokenKind.Reserved, current, "return");
+                            i += 5;
+                        }
+                        else
+                        {
+                            current = Token.NewToken(TokenKind.Identifier, current, this.Name(ref i));
+                        }
                         continue;
                     case char digit when char.IsDigit(digit):
                         current = this.Digit(current, ref i);
@@ -90,7 +98,23 @@
 
         private bool IsLetter(char c)
         {
-            return ('a' <= c && c <= 'z') || c == '_';
+            return 'a' <= c && c <= 'z';
+        }
+
+        private bool IsAlphaNum(char c)
+        {
+            return ('a' <= c && c <= 'z') || ('A' <= c && c <= 'Z') || c == '_';
+        }
+
+        private bool IsReturn(int i)
+        {
+            if (this.str.Length < (i + 6))
+            {
+                return false;
+            }
+            var s = str.Substring(i, 6);
+
+            return (s == "return") && !this.IsAlphaNum(this.str[i + 6]);
         }
 
         private string Name(ref int i)

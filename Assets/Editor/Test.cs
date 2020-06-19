@@ -16,29 +16,29 @@ public class CCCSTest
     [Test]
     public void テスト42()
     {
-        AssertEqual(0, "0;");
-        AssertEqual(42, "42;");
+        AssertEqual(0, "return 0;");
+        AssertEqual(42, "return 42;");
     }
 
     [Test]
     public void テスト加減算()
     {
-        AssertEqual(21, "5+20-4;");
-        AssertEqual(41, "12 + 34 - 5;");
+        AssertEqual(21, "return 5+20-4;");
+        AssertEqual(41, "return 12 + 34 - 5;");
     }
 
     [Test]
     public void テスト四則演算()
     {
-        AssertEqual(47, "5+6*7;");
-        AssertEqual(15, "5*(9-6);");
-        AssertEqual(4, "(3+5)/2;");
+        AssertEqual(47, "return 5+6*7;");
+        AssertEqual(15, "return 5*(9-6);");
+        AssertEqual(4, "return (3+5)/2;");
     }
 
     [Test]
     public void テスト単項演算子()
     {
-        AssertEqual(10, "-10+20;");
+        AssertEqual(10, "return -10+20;");
         // AssertEqual(10, "- -10;");
         // AssertEqual(10, "- - +10;");
     }
@@ -46,53 +46,53 @@ public class CCCSTest
     [Test]
     public void テスト比較演算子1()
     {
-        AssertEqual(0, "0==1;");
-        AssertEqual(1, "42==42;");
-        AssertEqual(1, "0!=1;");
-        AssertEqual(0, "42!=42;");
+        AssertEqual(0, "return 0==1;");
+        AssertEqual(1, "return 42==42;");
+        AssertEqual(1, "return 0!=1;");
+        AssertEqual(0, "return 42!=42;");
     }
 
     [Test]
     public void テスト比較演算子2()
     {
-        AssertEqual(1, "0<1;");
-        AssertEqual(0, "1<1;");
-        AssertEqual(0, "2<1;");
-        AssertEqual(1, "0<=1;");
-        AssertEqual(1, "1<=1;");
-        AssertEqual(0, "2<=1;");
+        AssertEqual(1, "return 0<1;");
+        AssertEqual(0, "return 1<1;");
+        AssertEqual(0, "return 2<1;");
+        AssertEqual(1, "return 0<=1;");
+        AssertEqual(1, "return 1<=1;");
+        AssertEqual(0, "return 2<=1;");
     }
 
     [Test]
     public void テスト比較演算子3()
     {
-        AssertEqual(1, "1>0;");
-        AssertEqual(0, "1>1;");
-        AssertEqual(0, "1>2;");
-        AssertEqual(1, "1>=0;");
-        AssertEqual(1, "1>=1;");
-        AssertEqual(0, "1>=2;");
+        AssertEqual(1, "return 1>0;");
+        AssertEqual(0, "return 1>1;");
+        AssertEqual(0, "return 1>2;");
+        AssertEqual(1, "return 1>=0;");
+        AssertEqual(1, "return 1>=1;");
+        AssertEqual(0, "return 1>=2;");
     }
 
     [Test]
     public void テストセミコロン()
     {
-        AssertEqual(3, "1;2;3;");
+        AssertEqual(3, "1;2;return 3;");
     }
 
     [Test]
     public void テスト代入()
     {
-        AssertEqual(3, "a=3;");
-        AssertEqual(2, "ab=2;");
+        AssertEqual(3, "a=3;return a;");
+        AssertEqual(2, "ab=2;return ab;");
     }
 
     [Test]
     public void テスト複数変数()
     {
-        AssertEqual(3, "foo=2;bar=1;foo+bar;");
-        AssertEqual(3, "foo=4;bar=2;(foo+bar)/2;");
-        AssertEqual(3, "foo=1;bar=2;foo=4;(foo+bar)/2;");
+        AssertEqual(3, "foo=2;bar=1;return foo+bar;");
+        AssertEqual(3, "foo=4;bar=2;return (foo+bar)/2;");
+        AssertEqual(3, "foo=1;bar=2;foo=4;return (foo+bar)/2;");
     }
 
     private void AssertEqual(int expect, string code)
