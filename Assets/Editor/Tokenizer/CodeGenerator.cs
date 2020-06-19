@@ -25,6 +25,8 @@ namespace CCCS
                     return $"{GenLVar(node)}  pop rax\n  mov rax, [rax]\n  push rax\n";
                 case NodeKind.Assign:
                     return $"{GenLVar(node.Lhs)}{CodeGen(node.Rhs)}  pop rdi\n  pop rax\n  mov [rax], rdi\n  push rdi\n";
+                case NodeKind.Return:
+                    return $"{CodeGen(node.Lhs)}  pop rax\n  mov rsp, rbp\n  pop rbp\n  ret\n";
             }
 
             var sb = new System.Text.StringBuilder();
