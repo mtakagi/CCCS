@@ -105,6 +105,15 @@ public class CCCSTest
     {
         AssertEqual(10, "i = 0; while(i < 10) i = i + 1; return i;");
     }
+
+    [Test]
+    public void テストfor文()
+    {
+        AssertEqual(55, "i=0; j=0; for (i=0; i<=10; i=i+1) j=i+j; return j;");
+        AssertEqual(3, "for (;;) return 3; return 5;");
+    }
+
+
     private void AssertEqual(int expect, string code)
     {
         var path = Write(Compiler.Compile(code));

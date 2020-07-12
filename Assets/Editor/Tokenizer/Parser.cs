@@ -56,6 +56,35 @@ namespace CCCS
 
                 return new Node(cond, then);
             }
+            else if (this.lexer.Consume("for"))
+            {
+                Node init = null;
+                Node cond = null;
+                Node inc = null;
+                this.lexer.Expect("(");
+
+                if (!this.lexer.Consume(";"))
+                {
+                    init = this.Expr();
+                    this.lexer.Expect(";");
+                }
+
+                if (!this.lexer.Consume(";"))
+                {
+                    cond = this.Expr();
+                    this.lexer.Expect(";");
+                }
+
+                if (!this.lexer.Consume(")"))
+                {
+                    inc = this.Expr();
+                    this.lexer.Expect(")");
+                }
+
+                var then = this.Statement();
+
+                return new Node(init, cond, inc, then);
+            }
             else
             {
 

@@ -12,6 +12,10 @@
         public Node Then { get; private set; }
         public Node Els { get; private set; }
 
+        public Node Init { get; private set; }
+
+        public Node Inc { get; private set; }
+
         public Node(NodeKind kind, Node lhs, Node rhs)
         {
             this.Kind = kind;
@@ -43,6 +47,15 @@
         {
             this.Kind = NodeKind.While;
             this.Cond = cond;
+            this.Then = then;
+        }
+
+        public Node(Node init, Node cond, Node inc, Node then)
+        {
+            this.Kind = NodeKind.For;
+            this.Init = init;
+            this.Cond = cond;
+            this.Inc = inc;
             this.Then = then;
         }
 

@@ -107,7 +107,7 @@
             return ('a' <= c && c <= 'z') || ('A' <= c && c <= 'Z') || c == '_';
         }
 
-        private static string[] keywords = { "return", "if", "else", "while" };
+        private static string[] keywords = { "return", "if", "else", "while", "for" };
 
         private string ParseKeyword(int i)
         {

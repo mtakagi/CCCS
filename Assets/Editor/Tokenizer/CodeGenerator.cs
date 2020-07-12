@@ -72,6 +72,38 @@ namespace CCCS
 
                         return builder.ToString();
                     }
+                case NodeKind.For:
+                    {
+                        var builder = new System.Text.StringBuilder();
+                        var seq = labelseq++;
+
+                        if (node.Init != null)
+                        {
+                            builder.Append(CodeGen(node.Init));
+                        }
+
+                        builder.Append($".L.begin.{seq}:\n");
+
+                        if (node.Cond != null)
+                        {
+                            builder.Append(CodeGen(node.Cond));
+                            builder.Append("  pop rax\n");
+                            builder.Append("  cmp rax, 0\n");
+                            builder.Append($"  je  .L.end.{seq}\n");
+                        }
+
+                        builder.Append(CodeGen(node.Then));
+
+                        if (node.Inc != null)
+                        {
+                            builder.Append(CodeGen(node.Inc));
+                        }
+
+                        builder.Append($"  jmp .L.begin.{seq}\n");
+                        builder.Append($".L.end.{seq}:\n");
+
+                        return builder.ToString();
+                    }
                 case NodeKind.Return:
                     return $"{CodeGen(node.Lhs)}  pop rax\n  mov rsp, rbp\n  pop rbp\n  ret\n";
             }

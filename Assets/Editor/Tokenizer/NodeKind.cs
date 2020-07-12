@@ -15,6 +15,7 @@
         Nunber,
         IF,
         While,
+        For,
         Return
     }
 }
