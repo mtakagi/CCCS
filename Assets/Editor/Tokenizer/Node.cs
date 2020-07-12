@@ -8,6 +8,14 @@
         public int IntValue { get; private set; }
         public int Offset { get; internal set; }
 
+        public Node Cond { get; private set; }
+        public Node Then { get; private set; }
+        public Node Els { get; private set; }
+
+        public Node Init { get; private set; }
+
+        public Node Inc { get; private set; }
+
         public Node(NodeKind kind, Node lhs, Node rhs)
         {
             this.Kind = kind;
@@ -25,6 +33,30 @@
         {
             this.Kind = kind;
             this.Offset = offset;
+        }
+
+        public Node(Node cond, Node then, Node els)
+        {
+            this.Kind = NodeKind.IF;
+            this.Cond = cond;
+            this.Then = then;
+            this.Els = els;
+        }
+
+        public Node(Node cond, Node then)
+        {
+            this.Kind = NodeKind.While;
+            this.Cond = cond;
+            this.Then = then;
+        }
+
+        public Node(Node init, Node cond, Node inc, Node then)
+        {
+            this.Kind = NodeKind.For;
+            this.Init = init;
+            this.Cond = cond;
+            this.Inc = inc;
+            this.Then = then;
         }
 
         override public string ToString()

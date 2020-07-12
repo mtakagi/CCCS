@@ -13,6 +13,9 @@
         LesserThan,
         LesserThanOrEqual,
         Nunber,
+        IF,
+        While,
+        For,
         Return
     }
 }
