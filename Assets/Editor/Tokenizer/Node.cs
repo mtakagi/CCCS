@@ -8,6 +8,10 @@
         public int IntValue { get; private set; }
         public int Offset { get; internal set; }
 
+        public Node Cond { get; private set; }
+        public Node Then { get; private set; }
+        public Node Els { get; private set; }
+
         public Node(NodeKind kind, Node lhs, Node rhs)
         {
             this.Kind = kind;
@@ -25,6 +29,14 @@
         {
             this.Kind = kind;
             this.Offset = offset;
+        }
+
+        public Node(Node cond, Node then, Node els)
+        {
+            this.Kind = NodeKind.IF;
+            this.Cond = cond;
+            this.Then = then;
+            this.Els = els;
         }
 
         override public string ToString()

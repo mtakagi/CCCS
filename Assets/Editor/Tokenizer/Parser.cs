@@ -32,6 +32,21 @@ namespace CCCS
             {
                 node = new Node(NodeKind.Return, this.Expr(), null);
             }
+            else if (this.lexer.Consume("if"))
+            {
+                this.lexer.Expect("(");
+                var cond = this.Expr();
+                this.lexer.Expect(")");
+                var then = this.Statement();
+                Node els = null;
+
+                if (this.lexer.Consume("else"))
+                {
+                    els = this.Statement();
+                }
+
+                return new Node(cond, then, els);
+            }
             else
             {
 

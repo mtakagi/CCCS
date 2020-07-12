@@ -13,6 +13,7 @@
         LesserThan,
         LesserThanOrEqual,
         Nunber,
+        IF,
         Return
     }
 }

@@ -1,8 +1,4 @@
-﻿using System.Collections;
-using System.Collections.Generic;
-using NUnit.Framework;
-using UnityEngine;
-using UnityEngine.TestTools;
+﻿using NUnit.Framework;
 using System.Text;
 using System.IO;
 using System.Diagnostics;
@@ -95,6 +91,15 @@ public class CCCSTest
         AssertEqual(3, "foo=1;bar=2;foo=4;return (foo+bar)/2;");
     }
 
+    [Test]
+    public void テストIF文()
+    {
+        AssertEqual(3, "if (0) return 2; return 3;");
+        AssertEqual(3, "if (1-1) return 2; return 3;");
+        AssertEqual(2, "if (1) return 2; return 3;");
+        AssertEqual(2, "if (2-1) return 2; return 3;");
+    }
+
     private void AssertEqual(int expect, string code)
     {
         var path = Write(Compiler.Compile(code));
@@ -119,6 +124,10 @@ public class CCCSTest
         using (var proc = Process.Start(info))
         {
             proc.WaitForExit();
+            if (proc.ExitCode != 0)
+            {
+                throw new System.Exception();
+            }
         }
     }
 

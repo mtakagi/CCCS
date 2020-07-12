@@ -76,10 +76,11 @@
                         current = Token.NewToken(TokenKind.Reserved, current, c.ToString());
                         continue;
                     case char letter when this.IsLetter(c):
-                        if (this.IsReturn(i))
+                        var keyword = this.ParseKeyword(i);
+                        if (keyword != null)
                         {
-                            current = Token.NewToken(TokenKind.Reserved, current, "return");
-                            i += 5;
+                            current = Token.NewToken(TokenKind.Reserved, current, keyword);
+                            i += keyword.Length - 1;
                         }
                         else
                         {
@@ -106,15 +107,25 @@
             return ('a' <= c && c <= 'z') || ('A' <= c && c <= 'Z') || c == '_';
         }
 
-        private bool IsReturn(int i)
-        {
-            if (this.str.Length < (i + 6))
-            {
-                return false;
-            }
-            var s = str.Substring(i, 6);
+        private static string[] keywords = { "return", "if", "else" };
 
-            return (s == "return") && !this.IsAlphaNum(this.str[i + 6]);
+        private string ParseKeyword(int i)
+        {
+            foreach (var keyword in keywords)
+            {
+                if (this.str.Length < (i + keyword.Length))
+                {
+                    return null;
+                }
+                var s = str.Substring(i, keyword.Length);
+
+                if ((s == keyword) && !this.IsAlphaNum(this.str[i + keyword.Length]))
+                {
+                    return keyword;
+                }
+            }
+
+            return null;
         }
 
         private string Name(ref int i)
