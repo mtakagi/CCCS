@@ -14,6 +14,7 @@
         LesserThanOrEqual,
         Nunber,
         IF,
+        While,
         Return
     }
 }

@@ -31,6 +31,7 @@ namespace CCCS
                     {
                         var builder = new System.Text.StringBuilder();
                         int seq = labelseq++;
+
                         if (node.Els != null)
                         {
                             builder.Append(CodeGen(node.Cond));
@@ -52,6 +53,22 @@ namespace CCCS
                             builder.Append(CodeGen(node.Then));
                             builder.Append($".L.end.{seq}:\n");
                         }
+
+                        return builder.ToString();
+                    }
+                case NodeKind.While:
+                    {
+                        var builder = new System.Text.StringBuilder();
+                        var seq = labelseq++;
+
+                        builder.Append($".L.begin.{seq}:\n");
+                        builder.Append(CodeGen(node.Cond));
+                        builder.Append("  pop rax\n");
+                        builder.Append("  cmp rax, 0\n");
+                        builder.Append($"  je  .L.end.{seq}\n");
+                        builder.Append(CodeGen(node.Then));
+                        builder.Append($"  jmp .L.begin.{seq}\n");
+                        builder.Append($".L.end.{seq}:\n");
 
                         return builder.ToString();
                     }

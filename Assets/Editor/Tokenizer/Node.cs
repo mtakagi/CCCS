@@ -39,6 +39,13 @@
             this.Els = els;
         }
 
+        public Node(Node cond, Node then)
+        {
+            this.Kind = NodeKind.While;
+            this.Cond = cond;
+            this.Then = then;
+        }
+
         override public string ToString()
         {
             if (this.Kind == NodeKind.Nunber)

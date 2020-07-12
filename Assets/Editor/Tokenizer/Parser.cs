@@ -47,6 +47,15 @@ namespace CCCS
 
                 return new Node(cond, then, els);
             }
+            else if (this.lexer.Consume("while"))
+            {
+                this.lexer.Expect("(");
+                var cond = this.Expr();
+                this.lexer.Expect(")");
+                var then = this.Statement();
+
+                return new Node(cond, then);
+            }
             else
             {
 
