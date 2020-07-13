@@ -20,6 +20,8 @@
 
         public string FuncName { get; private set; }
 
+        public Node Args { get; internal set; }
+
         public Node(NodeKind kind, Node lhs, Node rhs)
         {
             this.Kind = kind;

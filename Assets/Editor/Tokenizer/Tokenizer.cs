@@ -74,6 +74,7 @@
                     case ')':
                     case '{':
                     case '}':
+                    case ',':
                     case ';':
                         current = Token.NewToken(TokenKind.Reserved, current, c.ToString());
                         continue;

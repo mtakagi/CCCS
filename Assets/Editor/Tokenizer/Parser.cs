@@ -259,14 +259,31 @@ namespace CCCS
 
             if (token != null)
             {
+                Node node = null;
+
                 if (this.lexer.Consume("("))
                 {
-                    this.lexer.Expect(")");
+                    node = new Node(token.StrValue);
+                    if (this.lexer.Consume(")"))
+                    {
+                        return node;
+                    }
 
-                    return new Node(token.StrValue);
+                    var head = this.Assign();
+                    var cur = head;
+
+                    while (this.lexer.Consume(","))
+                    {
+                        cur.Next = this.Assign();
+                        cur = cur.Next;
+                    }
+                    this.lexer.Expect(")");
+                    node.Args = head;
+
+                    return node;
                 }
 
-                var node = new Node((token.StrValue[0] - 'a' + 1) * 8, NodeKind.LeftVariable);
+                node = new Node((token.StrValue[0] - 'a' + 1) * 8, NodeKind.LeftVariable);
 
                 return node;
             }

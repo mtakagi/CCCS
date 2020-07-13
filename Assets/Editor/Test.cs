@@ -128,6 +128,14 @@ public class CCCSTest
         AssertEqual(5, "return ret5();");
     }
 
+    [Test]
+    public void テストFuncArg()
+    {
+        AssertEqual(8, "return add(3, 5);");
+        AssertEqual(2, "return sub(5, 3);");
+        AssertEqual(21, "return add6(1,2,3,4,5,6);");
+    }
+
     private void AssertEqual(int expect, string code)
     {
         var path = Write(Compiler.Compile(code));
@@ -137,7 +145,14 @@ public class CCCSTest
 
     private void BuildLib(string path)
     {
-        var code = "int ret3() { return 3; }\nint ret5() { return 5; }";
+        var code =
+@"int ret3() { return 3; }
+int ret5() { return 5; }
+int add(int x, int y) { return x+y; }
+int sub(int x, int y) { return x-y; }
+int add6(int a, int b, int c, int d, int e, int f) {
+    return a+b+c+d+e+f;
+}";
         var filePath = Path.Combine(path, "lib.c");
         File.WriteAllText(filePath, code, Encoding.UTF8);
         var info = new ProcessStartInfo("cc", "-c -o lib.o lib.c");
