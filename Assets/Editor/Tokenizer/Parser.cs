@@ -99,7 +99,6 @@ namespace CCCS
             }
             else
             {
-
                 node = this.Expr();
             }
             this.lexer.Expect(";");
@@ -260,6 +259,13 @@ namespace CCCS
 
             if (token != null)
             {
+                if (this.lexer.Consume("("))
+                {
+                    this.lexer.Expect(")");
+
+                    return new Node(token.StrValue);
+                }
+
                 var node = new Node((token.StrValue[0] - 'a' + 1) * 8, NodeKind.LeftVariable);
 
                 return node;

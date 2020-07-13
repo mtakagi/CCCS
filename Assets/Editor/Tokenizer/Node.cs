@@ -18,6 +18,8 @@
 
         public Node Next { get; internal set; }
 
+        public string FuncName { get; private set; }
+
         public Node(NodeKind kind, Node lhs, Node rhs)
         {
             this.Kind = kind;
@@ -64,6 +66,12 @@
         public Node()
         {
             this.Kind = NodeKind.Body;
+        }
+
+        public Node(string funcName)
+        {
+            this.Kind = NodeKind.FunctionCall;
+            this.FuncName = funcName;
         }
 
         override public string ToString()

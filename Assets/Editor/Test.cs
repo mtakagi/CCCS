@@ -121,11 +121,38 @@ public class CCCSTest
         AssertEqual(10, "i = 0; while(i < 10) {i = i + 1;} return i;");
     }
 
+    [Test]
+    public void テストFuncCall()
+    {
+        AssertEqual(3, "return ret3();");
+        AssertEqual(5, "return ret5();");
+    }
+
     private void AssertEqual(int expect, string code)
     {
         var path = Write(Compiler.Compile(code));
         Compile(path);
         Assert.AreEqual(expect, Execute(path));
+    }
+
+    private void BuildLib(string path)
+    {
+        var code = "int ret3() { return 3; }\nint ret5() { return 5; }";
+        var filePath = Path.Combine(path, "lib.c");
+        File.WriteAllText(filePath, code, Encoding.UTF8);
+        var info = new ProcessStartInfo("cc", "-c -o lib.o lib.c");
+
+        info.UseShellExecute = false;
+        info.WorkingDirectory = path;
+
+        using (var proc = Process.Start(info))
+        {
+            proc.WaitForExit();
+            if (proc.ExitCode != 0)
+            {
+                throw new System.Exception();
+            }
+        }
     }
 
     private string Write(string asm)
@@ -138,7 +165,8 @@ public class CCCSTest
 
     private void Compile(string path)
     {
-        var info = new ProcessStartInfo("cc", $"-o {OutputExeFileName} {OutputFileName}");
+        BuildLib(path);
+        var info = new ProcessStartInfo("cc", $"-o {OutputExeFileName} {OutputFileName} lib.o");
 
         info.WorkingDirectory = path;
 

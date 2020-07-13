@@ -116,6 +116,8 @@ namespace CCCS
 
                         return builder.ToString();
                     }
+                case NodeKind.FunctionCall:
+                    return $"  call _{node.FuncName}\n  push rax\n";
                 case NodeKind.Return:
                     return $"{CodeGen(node.Lhs)}  pop rax\n  mov rsp, rbp\n  pop rbp\n  ret\n";
             }
