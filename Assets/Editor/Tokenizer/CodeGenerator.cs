@@ -104,6 +104,18 @@ namespace CCCS
 
                         return builder.ToString();
                     }
+                case NodeKind.Body:
+                    {
+                        var builder = new StringBuilder();
+                        var next = node.Next;
+                        while (next != null)
+                        {
+                            builder.Append(CodeGen(next));
+                            next = next.Next;
+                        }
+
+                        return builder.ToString();
+                    }
                 case NodeKind.Return:
                     return $"{CodeGen(node.Lhs)}  pop rax\n  mov rsp, rbp\n  pop rbp\n  ret\n";
             }

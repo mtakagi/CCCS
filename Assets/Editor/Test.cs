@@ -113,6 +113,13 @@ public class CCCSTest
         AssertEqual(3, "for (;;) return 3; return 5;");
     }
 
+    [Test]
+    public void テストブロック()
+    {
+        AssertEqual(3, "{1; {2;} return 3;}");
+        AssertEqual(55, "i=0; j=0; while (i<=10) {j=i+j; i=i+1;} return j;");
+        AssertEqual(10, "i = 0; while(i < 10) {i = i + 1;} return i;");
+    }
 
     private void AssertEqual(int expect, string code)
     {

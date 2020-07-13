@@ -85,6 +85,18 @@ namespace CCCS
 
                 return new Node(init, cond, inc, then);
             }
+            else if (this.lexer.Consume("{"))
+            {
+                var head = new Node();
+                node = head;
+                while (!this.lexer.Consume("}"))
+                {
+                    head.Next = this.Statement();
+                    head = head.Next;
+                }
+
+                return node;
+            }
             else
             {
 

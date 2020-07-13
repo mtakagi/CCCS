@@ -16,6 +16,7 @@
         IF,
         While,
         For,
+        Body,
         Return
     }
 }
