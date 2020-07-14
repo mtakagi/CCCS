@@ -9,10 +9,13 @@ namespace CCCS
         public List<Node> Code { get; private set; }
         public List<LocalVariable> Locals { get; private set; }
 
+        public List<Function> Func { get; private set; }
+
         public Parser(TokenLexer lexer)
         {
             this.lexer = lexer;
             this.Code = new List<Node>();
+            this.Func = new List<Function>();
             this.Locals = new List<LocalVariable>();
         }
 
@@ -20,8 +23,33 @@ namespace CCCS
         {
             while (!this.lexer.IsEOF())
             {
-                this.Code.Add(Statement());
+                this.Func.Add(this.Function());
             }
+        }
+
+        public Function Function()
+        {
+            var token = this.lexer.ConsumeIdentifier();
+
+            this.lexer.Expect("(");
+            this.lexer.Expect(")");
+            this.lexer.Expect("{");
+
+            var node = new Node();
+            var head = node;
+
+            while (!this.lexer.Consume("}"))
+            {
+                node.Next = this.Statement();
+                node = node.Next;
+            }
+
+            var func = new Function();
+
+            func.Name = token.StrValue;
+            func.Node = head.Next;
+
+            return func;
         }
 
         public Node Statement()

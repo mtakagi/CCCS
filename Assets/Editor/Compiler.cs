@@ -14,23 +14,42 @@ namespace CCCS
 
             parser.Program();
 
-            sb.Append(".intel_syntax noprefix\n");
-            sb.Append(".globl _main\n");
-            sb.Append("_main:\n");
-
-            sb.Append("  push rbp\n");
-            sb.Append("  mov rbp, rsp\n");
-            sb.Append("  sub rsp, 208\n");
-
-            foreach (var node in parser.Code)
+            foreach (var func in parser.Func)
             {
-                sb.Append(CodeGenerator.CodeGen(node));
-                sb.Append("  pop rax\n");
+                var offset = 0;
+                for (var val = func.Locals; val != null; val = val.Next)
+                {
+                    offset += 8;
+                    val.Offset = offset;
+                }
+                func.StackSize = offset;
+
+                if (offset == 0)
+                {
+                    func.StackSize = 208;
+                }
             }
 
-            sb.Append("  mov rsp, rbp\n");
-            sb.Append("  pop rbp\n");
-            sb.Append("  ret\n");
+            sb.Append(".intel_syntax noprefix\n");
+            foreach (var func in parser.Func)
+            {
+                sb.Append($".globl _{func.Name}\n");
+                sb.Append($"_{func.Name}:\n");
+
+                sb.Append("  push rbp\n");
+                sb.Append("  mov rbp, rsp\n");
+                sb.Append($"  sub rsp, {func.StackSize}\n");
+
+                for (var node = func.Node; node != null; node = node.Next)
+                {
+                    sb.Append(CodeGenerator.CodeGen(node, func.Name));
+                }
+
+                sb.Append($".L.return.{func.Name}:\n");
+                sb.Append("  mov rsp, rbp\n");
+                sb.Append("  pop rbp\n");
+                sb.Append("  ret\n");
+            }
 
             return sb.ToString();
         }
