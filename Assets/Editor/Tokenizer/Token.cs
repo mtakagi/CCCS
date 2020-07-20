@@ -28,7 +28,11 @@ namespace CCCS
         public static Token NewToken(TokenKind kind, Token current, string str)
         {
             var token = new Token(kind, str);
-            current.Next = token;
+
+            if (current != null)
+            {
+                current.Next = token;
+            }
 
             return token;
         }

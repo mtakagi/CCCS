@@ -1,0 +1,208 @@
+using System.IO;
+
+namespace CCCS
+{
+    public class TokenReader : System.IDisposable
+    {
+        private StreamReader mReader;
+        private string mLine;
+        private int mMaxLength;
+
+        public int LineNumber { get; private set; }
+
+        public int CurrentIndex { get; private set; }
+
+        public Token CurrentToken { get; private set; }
+
+        public string Identifier { get; private set; }
+
+        public TokenReader(string path)
+        {
+            mReader = new StreamReader(path);
+            this.ReadLine();
+        }
+
+        public TokenReader(Stream stream)
+        {
+            mReader = new StreamReader(stream);
+            this.ReadLine();
+        }
+
+        private void ReadLine()
+        {
+            while ((this.mLine = this.mReader.ReadLine()) != null)
+            {
+                this.LineNumber++;
+
+                if ((this.mMaxLength = this.mLine.Length) > 0)
+                {
+                    this.CurrentIndex = 0;
+                    break;
+                }
+            }
+        }
+
+        private char ReadChar()
+        {
+            if (this.CurrentIndex < this.mMaxLength)
+            {
+                return this.mLine[this.CurrentIndex];
+            }
+            else
+            {
+                return ' ';
+            }
+        }
+
+        public Token NextToken()
+        {
+            if (this.mLine == null)
+            {
+                return Token.NewToken(TokenKind.EOF, this.CurrentToken, "\0");
+            }
+
+            char nextChar;
+
+            do
+            {
+                if (this.CurrentIndex == this.mMaxLength)
+                {
+                    this.ReadLine();
+
+                    if (this.mLine == null)
+                    {
+                        return Token.NewToken(TokenKind.EOF, this.CurrentToken, "\0");
+                    }
+                }
+
+                nextChar = this.ReadChar();
+                this.CurrentIndex++;
+            } while (char.IsWhiteSpace(nextChar));
+
+            switch (nextChar)
+            {
+                case '!':
+                    if (this.ReadChar() == '=')
+                    {
+                        this.CurrentIndex++;
+                        return (this.CurrentToken = Token.NewToken(TokenKind.Reserved, this.CurrentToken, "!="));
+                    }
+                    else
+                    {
+                        throw new System.Exception();
+                    }
+                case '<':
+                case '>':
+                case '=':
+                    var prevChar = nextChar;
+                    nextChar = this.ReadChar();
+                    if (nextChar == '=' || nextChar == '>' || nextChar == '<')
+                    {
+                        this.CurrentIndex++;
+                        return (this.CurrentToken = Token.NewToken(TokenKind.Reserved, this.CurrentToken, $"{prevChar}{nextChar}"));
+                    }
+                    else
+                    {
+                        nextChar = prevChar;
+                        goto case '+';
+                    }
+                case '/':
+                    if (this.ReadChar() == '/')
+                    {
+                        this.ReadLine();
+                        return this.NextToken();
+                    }
+                    goto case '+';
+                case '+':
+                case '-':
+                case '*':
+                case '%':
+                case '&':
+                case '(':
+                case ')':
+                case '{':
+                case '}':
+                case '[':
+                case ']':
+                case '?':
+                case ':':
+                case ',':
+                case ';':
+                    return (this.CurrentToken = Token.NewToken(TokenKind.Reserved, this.CurrentToken, nextChar.ToString()));
+                case char letter when char.IsLetter(letter):
+                    var start = this.CurrentIndex - 1;
+
+                    while (char.IsLetterOrDigit(this.ReadChar()))
+                    {
+                        this.CurrentIndex++;
+                    }
+                    this.Identifier = this.mLine.Substring(start, this.CurrentIndex - start);
+                    switch (this.Identifier)
+                    {
+                        // storage specifier
+                        case "auto":
+                        case "register":
+                        case "static":
+                        case "extern":
+                        case "typedef":
+                        // type specifier
+                        case "void":
+                        case "char":
+                        case "short":
+                        case "int":
+                        case "long":
+                        case "float":
+                        case "double":
+                        case "signed":
+                        case "unsigned":
+                        // type qualifier
+                        case "const":
+                        case "volatile":
+                        // struct & union
+                        case "struct":
+                        case "union":
+                        // selection statement
+                        case "if":
+                        case "else":
+                        case "switch":
+                        // label statement
+                        case "case":
+                        case "default":
+                        // iteration statement
+                        case "while":
+                        case "do":
+                        case "for":
+                        // Jump statement
+                        case "goto":
+                        case "break":
+                        case "continue":
+                        case "return":
+                            return (this.CurrentToken = Token.NewToken(TokenKind.Reserved, this.CurrentToken, this.Identifier));
+                        default:
+                            return (this.CurrentToken = Token.NewToken(TokenKind.Identifier, this.CurrentToken, this.Identifier));
+                    }
+                case char digit when char.IsDigit(digit):
+                    int value = 0;
+                    for (value = int.Parse(nextChar.ToString()); char.IsDigit((nextChar = this.ReadChar())); this.CurrentIndex++)
+                    {
+                        value = value * 10 + int.Parse(nextChar.ToString());
+                    }
+
+                    this.CurrentToken = Token.NewToken(TokenKind.Number, this.CurrentToken, "\0");
+                    this.CurrentToken.IntValue = value;
+
+                    return this.CurrentToken;
+                default:
+                    throw new System.Exception();
+            }
+        }
+
+        public void Dispose()
+        {
+            if (mReader != null)
+            {
+                mReader.Dispose();
+            }
+        }
+    }
+}
