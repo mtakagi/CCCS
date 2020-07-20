@@ -4,6 +4,8 @@ namespace CCCS
 {
     public class Compiler
     {
+        private static string[] reg = { "rdi", "rsi", "rdx", "rcx", "r8", "r9" };
+
         public static string Compile(string str)
         {
             var tokenizer = new CCCS.Tokenizer(str);
@@ -19,15 +21,10 @@ namespace CCCS
                 var offset = 0;
                 for (var val = func.Locals; val != null; val = val.Next)
                 {
-                    offset += 8;
-                    val.Offset = offset;
+                    offset += 64;
+                    val.Var.Offset = offset;
                 }
                 func.StackSize = offset;
-
-                if (offset == 0)
-                {
-                    func.StackSize = 208;
-                }
             }
 
             sb.Append(".intel_syntax noprefix\n");
@@ -39,6 +36,14 @@ namespace CCCS
                 sb.Append("  push rbp\n");
                 sb.Append("  mov rbp, rsp\n");
                 sb.Append($"  sub rsp, {func.StackSize}\n");
+
+                var i = 0;
+
+                for (var list = func.Params; list != null; list = list.Next)
+                {
+                    var val = list.Var;
+                    sb.Append($"  mov [rbp-{val.Offset}], {reg[i++]}\n");
+                }
 
                 for (var node = func.Node; node != null; node = node.Next)
                 {

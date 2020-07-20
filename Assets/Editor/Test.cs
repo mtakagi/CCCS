@@ -142,6 +142,14 @@ public class CCCSTest
         AssertEqual(32, "main() { return ret32(); } ret32() { return 32; }");
     }
 
+    [Test]
+    public void テストFuncWithArg定義()
+    {
+        AssertEqual(7, "main() { return add2(3,4); } add2(x,y) { return x+y; }");
+        AssertEqual(1, "main() { return sub2(4,3); } sub2(x,y) { return x-y; }");
+        AssertEqual(55, "main() { return fib(9); } fib(x) { if (x<=1) return 1; return fib(x-1) + fib(x-2); }");
+    }
+
     private void AssertEqual(int expect, string code)
     {
         var path = Write(Compiler.Compile(code));
