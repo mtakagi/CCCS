@@ -54,6 +54,21 @@ namespace CCCS
             }
         }
 
+        private bool IsAscii(char c)
+        {
+            return ('a' <= c && c <= 'z') || ('A' <= c && c <= 'Z');
+        }
+
+        private bool IsNumber(char c)
+        {
+            return ('0' <= c && c <= '9');
+        }
+
+        private bool IsAlphaNum(char c)
+        {
+            return this.IsAscii(c) || this.IsNumber(c);
+        }
+
         public Token NextToken()
         {
             if (this.mLine == null)
@@ -129,10 +144,10 @@ namespace CCCS
                 case ',':
                 case ';':
                     return (this.CurrentToken = Token.NewToken(TokenKind.Reserved, this.CurrentToken, nextChar.ToString()));
-                case char letter when char.IsLetter(letter):
+                case char letter when this.IsAscii(letter):
                     var start = this.CurrentIndex - 1;
 
-                    while (char.IsLetterOrDigit(this.ReadChar()))
+                    while (this.IsAlphaNum(this.ReadChar()))
                     {
                         this.CurrentIndex++;
                     }
@@ -181,19 +196,19 @@ namespace CCCS
                         default:
                             return (this.CurrentToken = Token.NewToken(TokenKind.Identifier, this.CurrentToken, this.Identifier));
                     }
-                case char digit when char.IsDigit(digit):
+                case char digit when this.IsNumber(digit):
                     int value = 0;
-                    for (value = int.Parse(nextChar.ToString()); char.IsDigit((nextChar = this.ReadChar())); this.CurrentIndex++)
+                    for (value = int.Parse(nextChar.ToString()); this.IsNumber((nextChar = this.ReadChar())); this.CurrentIndex++)
                     {
                         value = value * 10 + int.Parse(nextChar.ToString());
                     }
 
-                    this.CurrentToken = Token.NewToken(TokenKind.Number, this.CurrentToken, "\0");
+                    this.CurrentToken = Token.NewToken(TokenKind.Number, this.CurrentToken, value.ToString());
                     this.CurrentToken.IntValue = value;
 
                     return this.CurrentToken;
                 default:
-                    throw new System.Exception();
+                    throw new TokenizeException(this.LineNumber, this.CurrentIndex, this.mLine, nextChar);
             }
         }
 
