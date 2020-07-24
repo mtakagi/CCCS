@@ -54,6 +54,11 @@ namespace CCCS
             }
         }
 
+        public bool IsNoneDigit(char c)
+        {
+            return this.IsAscii(c) || (c == '_');
+        }
+
         private bool IsAscii(char c)
         {
             return ('a' <= c && c <= 'z') || ('A' <= c && c <= 'Z');
@@ -66,7 +71,7 @@ namespace CCCS
 
         private bool IsAlphaNum(char c)
         {
-            return this.IsAscii(c) || this.IsNumber(c);
+            return this.IsNoneDigit(c) || this.IsNumber(c);
         }
 
         public Token NextToken()
@@ -144,7 +149,7 @@ namespace CCCS
                 case ',':
                 case ';':
                     return (this.CurrentToken = Token.NewToken(TokenKind.Reserved, this.CurrentToken, nextChar.ToString()));
-                case char letter when this.IsAscii(letter):
+                case char letter when this.IsNoneDigit(letter):
                     var start = this.CurrentIndex - 1;
 
                     while (this.IsAlphaNum(this.ReadChar()))
