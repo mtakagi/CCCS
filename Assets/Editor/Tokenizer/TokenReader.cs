@@ -149,6 +149,41 @@ namespace CCCS
                 case ',':
                 case ';':
                     return (this.CurrentToken = Token.NewToken(TokenKind.Reserved, this.CurrentToken, nextChar.ToString()));
+                // TODO: Support control character
+                case '"':
+                    {
+                        var sb = new System.Text.StringBuilder();
+                        nextChar = this.ReadChar();
+                        this.CurrentIndex++;
+
+                        while (nextChar != '"')
+                        {
+                            sb.Append(nextChar);
+                            nextChar = this.ReadChar();
+                            this.CurrentIndex++;
+                        }
+
+                        sb.Append('\0');
+
+                        return (this.CurrentToken = Token.NewToken(TokenKind.String, this.CurrentToken, sb.ToString()));
+                    }
+                // TODO: Support control character
+                case '\'':
+                    {
+                        var c = this.ReadChar();
+                        this.CurrentIndex++;
+                        nextChar = this.ReadChar();
+                        this.CurrentIndex++;
+
+                        if (nextChar != '\'')
+                        {
+                            throw new TokenizeException(this.LineNumber, this.CurrentIndex, this.mLine, nextChar);
+                        }
+
+                        var token = Token.NewToken(TokenKind.Number, this.CurrentToken, c.ToString());
+                        token.IntValue = c;
+                        return (this.CurrentToken = token);
+                    }
                 case char letter when this.IsNoneDigit(letter):
                     var start = this.CurrentIndex - 1;
 
@@ -156,6 +191,7 @@ namespace CCCS
                     {
                         this.CurrentIndex++;
                     }
+                    // TODO: Support C99 keyword
                     this.Identifier = this.mLine.Substring(start, this.CurrentIndex - start);
                     switch (this.Identifier)
                     {
@@ -201,6 +237,7 @@ namespace CCCS
                         default:
                             return (this.CurrentToken = Token.NewToken(TokenKind.Identifier, this.CurrentToken, this.Identifier));
                     }
+                // TODO: Support float etc
                 case char digit when this.IsNumber(digit):
                     int value = 0;
                     for (value = int.Parse(nextChar.ToString()); this.IsNumber((nextChar = this.ReadChar())); this.CurrentIndex++)
@@ -212,6 +249,8 @@ namespace CCCS
                     this.CurrentToken.IntValue = value;
 
                     return this.CurrentToken;
+                case char punc when char.IsPunctuation(punc):
+                    return (this.CurrentToken = Token.NewToken(TokenKind.Reserved, this.CurrentToken, punc.ToString()));
                 default:
                     throw new TokenizeException(this.LineNumber, this.CurrentIndex, this.mLine, nextChar);
             }

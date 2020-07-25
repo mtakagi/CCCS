@@ -6,6 +6,7 @@
         Reserved,
         Identifier,
         Number,
+        String,
         EOF
     }
 }
