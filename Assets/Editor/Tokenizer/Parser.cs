@@ -52,16 +52,13 @@ namespace CCCS
 
             head.Var = this.ParameterDeclaration(token.StrValue);
 
-            if (!this.lexer.Consume(")"))
+            while (!this.lexer.Consume(")"))
             {
-                while (!this.lexer.Consume(")"))
-                {
-                    this.lexer.Expect(",");
-                    token = this.lexer.ConsumeIdentifier();
-                    cur.Next = new VariableList();
-                    cur.Next.Var = this.ParameterDeclaration(token.StrValue);
-                    cur = cur.Next;
-                }
+                this.lexer.Expect(",");
+                token = this.lexer.ConsumeIdentifier();
+                cur.Next = new VariableList();
+                cur.Next.Var = this.ParameterDeclaration(token.StrValue);
+                cur = cur.Next;
             }
 
             return head;
@@ -342,12 +339,12 @@ namespace CCCS
 
 
                 var local = this.Locals == null ? null : this.Locals.Find(obj => obj.Name == token.StrValue);
-                node = new Node((token.StrValue[0] - 'a' + 1) * 8, NodeKind.LeftVariable);
 
                 if (local == null)
                 {
                     local = this.ParameterDeclaration(token.StrValue);
                 }
+                node = new Node(local);
 
                 return node;
             }

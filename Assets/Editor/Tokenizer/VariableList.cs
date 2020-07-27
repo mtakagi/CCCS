@@ -9,7 +9,7 @@ namespace CCCS
 
         public LocalVariable Find(Predicate<LocalVariable> predicate)
         {
-            for (var val = this; val != null; val = this.Next)
+            for (var val = this; val != null; val = val.Next)
             {
                 if (predicate(val.Var))
                 {
