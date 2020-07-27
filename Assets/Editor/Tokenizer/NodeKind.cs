@@ -17,6 +17,7 @@
         While,
         For,
         Body,
+        FunctionCall,
         Return
     }
 }

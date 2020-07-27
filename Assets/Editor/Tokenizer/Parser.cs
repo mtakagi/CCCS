@@ -7,21 +7,89 @@ namespace CCCS
     {
         private TokenLexer lexer;
         public List<Node> Code { get; private set; }
-        public List<LocalVariable> Locals { get; private set; }
+        public VariableList Locals { get; private set; }
+
+        public List<Function> Func { get; private set; }
 
         public Parser(TokenLexer lexer)
         {
             this.lexer = lexer;
             this.Code = new List<Node>();
-            this.Locals = new List<LocalVariable>();
+            this.Func = new List<Function>();
         }
 
         public void Program()
         {
             while (!this.lexer.IsEOF())
             {
-                this.Code.Add(Statement());
+                this.Func.Add(this.Function());
             }
+        }
+
+        public LocalVariable ParameterDeclaration(string name)
+        {
+            var val = new LocalVariable(name, 0);
+            var list = new VariableList();
+
+            list.Var = val;
+            list.Next = this.Locals;
+
+            this.Locals = list;
+
+            return val;
+        }
+
+        public VariableList ParameterList()
+        {
+            if (this.lexer.Consume(")"))
+            {
+                return null;
+            }
+
+            var token = this.lexer.ConsumeIdentifier();
+            var head = new VariableList();
+            var cur = head;
+
+            head.Var = this.ParameterDeclaration(token.StrValue);
+
+            while (!this.lexer.Consume(")"))
+            {
+                this.lexer.Expect(",");
+                token = this.lexer.ConsumeIdentifier();
+                cur.Next = new VariableList();
+                cur.Next.Var = this.ParameterDeclaration(token.StrValue);
+                cur = cur.Next;
+            }
+
+            return head;
+        }
+
+        public Function Function()
+        {
+            var token = this.lexer.ConsumeIdentifier();
+            var node = new Node();
+            var func = new Function();
+
+            var head = node;
+
+            this.Locals = null;
+            this.lexer.Expect("(");
+            func.Params = this.ParameterList();
+            this.lexer.Expect("{");
+
+
+            while (!this.lexer.Consume("}"))
+            {
+                node.Next = this.Statement();
+                node = node.Next;
+            }
+
+
+            func.Name = token.StrValue;
+            func.Node = head.Next;
+            func.Locals = this.Locals;
+
+            return func;
         }
 
         public Node Statement()
@@ -99,7 +167,6 @@ namespace CCCS
             }
             else
             {
-
                 node = this.Expr();
             }
             this.lexer.Expect(";");
@@ -119,20 +186,6 @@ namespace CCCS
             if (this.lexer.Consume("="))
             {
                 node = new Node(NodeKind.Assign, node, this.Assign());
-
-                var local = this.Locals.Find(obj => obj.Name == this.lexer.token.StrValue);
-
-                if (local != null)
-                {
-                    node.Offset = local.Offset;
-                }
-                else
-                {
-                    var offset = this.Locals.Count != 0 ? this.Locals.Last().Offset : 8;
-                    local = new LocalVariable(this.lexer.token.StrValue, offset);
-                    node.Offset = local.Offset;
-                    this.Locals.Add(local);
-                }
             }
 
             return node;
@@ -260,7 +313,38 @@ namespace CCCS
 
             if (token != null)
             {
-                var node = new Node((token.StrValue[0] - 'a' + 1) * 8, NodeKind.LeftVariable);
+                Node node = null;
+
+                if (this.lexer.Consume("("))
+                {
+                    node = new Node(token.StrValue);
+                    if (this.lexer.Consume(")"))
+                    {
+                        return node;
+                    }
+
+                    var head = this.Assign();
+                    var cur = head;
+
+                    while (this.lexer.Consume(","))
+                    {
+                        cur.Next = this.Assign();
+                        cur = cur.Next;
+                    }
+                    this.lexer.Expect(")");
+                    node.Args = head;
+
+                    return node;
+                }
+
+
+                var local = this.Locals == null ? null : this.Locals.Find(obj => obj.Name == token.StrValue);
+
+                if (local == null)
+                {
+                    local = this.ParameterDeclaration(token.StrValue);
+                }
+                node = new Node(local);
 
                 return node;
             }

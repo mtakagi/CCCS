@@ -6,7 +6,9 @@
         public Node Lhs { get; private set; }
         public Node Rhs { get; private set; }
         public int IntValue { get; private set; }
-        public int Offset { get; internal set; }
+
+        public LocalVariable Var { get; private set; }
+        public int Offset => this.Var.Offset;
 
         public Node Cond { get; private set; }
         public Node Then { get; private set; }
@@ -17,6 +19,10 @@
         public Node Inc { get; private set; }
 
         public Node Next { get; internal set; }
+
+        public string FuncName { get; private set; }
+
+        public Node Args { get; internal set; }
 
         public Node(NodeKind kind, Node lhs, Node rhs)
         {
@@ -31,10 +37,10 @@
             this.IntValue = value;
         }
 
-        public Node(int offset, NodeKind kind = NodeKind.LeftVariable)
+        public Node(LocalVariable var)
         {
-            this.Kind = kind;
-            this.Offset = offset;
+            this.Kind = NodeKind.LeftVariable;
+            this.Var = var;
         }
 
         public Node(Node cond, Node then, Node els)
@@ -64,6 +70,12 @@
         public Node()
         {
             this.Kind = NodeKind.Body;
+        }
+
+        public Node(string funcName)
+        {
+            this.Kind = NodeKind.FunctionCall;
+            this.FuncName = funcName;
         }
 
         override public string ToString()

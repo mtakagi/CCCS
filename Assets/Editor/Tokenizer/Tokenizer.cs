@@ -74,6 +74,7 @@
                     case ')':
                     case '{':
                     case '}':
+                    case ',':
                     case ';':
                         current = Token.NewToken(TokenKind.Reserved, current, c.ToString());
                         continue;
@@ -106,7 +107,7 @@
 
         private bool IsAlphaNum(char c)
         {
-            return ('a' <= c && c <= 'z') || ('A' <= c && c <= 'Z') || c == '_';
+            return ('a' <= c && c <= 'z') || ('A' <= c && c <= 'Z') || ('0' <= c && c <= '9') || c == '_';
         }
 
         private static string[] keywords = { "return", "if", "else", "while", "for" };
@@ -139,7 +140,7 @@
                 sb.Append(c);
                 i++;
                 c = this.str[i];
-            } while (this.IsLetter(c));
+            } while (this.IsAlphaNum(c));
 
             i--;
 

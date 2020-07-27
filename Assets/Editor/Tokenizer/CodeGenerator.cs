@@ -5,7 +5,9 @@ namespace CCCS
 
     public class CodeGenerator
     {
+        private static string[] reg = { "rdi", "rsi", "rdx", "rcx", "r8", "r9" };
         private static int labelseq = 1;
+        private static string functionname = "";
 
         private static string GenLVar(Node node)
         {
@@ -17,8 +19,12 @@ namespace CCCS
             return $"  mov rax, rbp\n  sub rax, {node.Offset}\n  push rax\n";
         }
 
-        public static string CodeGen(Node node)
+        public static string CodeGen(Node node, string funcname = "")
         {
+            if (!string.IsNullOrEmpty(funcname) && funcname != functionname)
+            {
+                functionname = funcname;
+            }
             switch (node.Kind)
             {
                 case NodeKind.Nunber:
@@ -116,8 +122,41 @@ namespace CCCS
 
                         return builder.ToString();
                     }
+                case NodeKind.FunctionCall:
+                    {
+                        var builder = new StringBuilder();
+                        var arglen = 0;
+
+                        for (var arg = node.Args; arg != null; arg = arg.Next)
+                        {
+                            builder.Append(CodeGen(arg));
+                            arglen++;
+                        }
+
+                        for (var i = arglen - 1; i >= 0; i--)
+                        {
+                            builder.Append($"  pop {reg[i]}\n");
+                        }
+
+                        var seq = labelseq++;
+                        builder.Append("  mov rax, rsp\n");
+                        builder.Append("  and rax, 15\n");
+                        builder.Append($"  jnz .L.call.{seq}\n");
+                        builder.Append("  mov rax, 0\n");
+                        builder.Append($"  call _{node.FuncName}\n");
+                        builder.Append($"  jmp .L.end.{seq}\n");
+                        builder.Append($".L.call.{seq}:\n");
+                        builder.Append("  sub rsp, 8\n");
+                        builder.Append("  mov rax, 0\n");
+                        builder.Append($"  call _{node.FuncName}\n");
+                        builder.Append("  add rsp, 8\n");
+                        builder.Append($".L.end.{seq}:\n");
+                        builder.Append("  push rax\n");
+
+                        return builder.ToString();
+                    }
                 case NodeKind.Return:
-                    return $"{CodeGen(node.Lhs)}  pop rax\n  mov rsp, rbp\n  pop rbp\n  ret\n";
+                    return $"{CodeGen(node.Lhs)}  pop rax\n  jmp .L.return.{functionname}\n";
             }
 
             var sb = new System.Text.StringBuilder();
