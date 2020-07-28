@@ -2,7 +2,7 @@
 {
     public enum TokenKind
     {
-        NOP,
+        Unknown,
         Reserved,
         Identifier,
         Number,

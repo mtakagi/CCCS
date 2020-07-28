@@ -22,7 +22,7 @@ namespace CCCS
 
         public static Token NewToken()
         {
-            return new Token(TokenKind.NOP, "\0");
+            return new Token(TokenKind.Unknown, "\0");
         }
 
         public static Token NewToken(TokenKind kind, Token current, string str)
