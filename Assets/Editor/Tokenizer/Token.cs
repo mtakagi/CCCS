@@ -20,11 +20,6 @@ namespace CCCS
 
         public bool IsEOF() => this.Kind == TokenKind.EOF;
 
-        public static Token NewToken()
-        {
-            return new Token(TokenKind.Unknown, "\0");
-        }
-
         public static Token NewToken(TokenKind kind, Token current, string str)
         {
             var token = new Token(kind, str);
