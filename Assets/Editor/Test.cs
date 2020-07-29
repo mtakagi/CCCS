@@ -151,6 +151,20 @@ public class CCCSTest
         AssertEqual(55, "main() { return fib(9); } fib(x) { if (x<=1) return 1; return fib(x-1) + fib(x-2); }");
     }
 
+    [Test]
+    public void テストTokenizeException()
+    {
+        var e = Assert.Throws<TokenizeException>(
+            () =>
+            {
+                var code = "main() {return 0;あ}";
+                Compiler.Compile(code);
+            }
+        );
+
+        Assert.NotNull(e);
+    }
+
     private void AssertEqual(int expect, string code)
     {
         var path = Write(Compiler.Compile(code));
@@ -161,7 +175,7 @@ public class CCCSTest
     private void BuildLib(string path)
     {
         var code =
-@"int ret3() { return 3; }
+    @"int ret3() { return 3; }
 int ret5() { return 5; }
 int add(int x, int y) { return x+y; }
 int sub(int x, int y) { return x-y; }
