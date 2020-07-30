@@ -165,6 +165,18 @@ public class CCCSTest
         Assert.NotNull(e);
     }
 
+    [Test]
+    public void テストPointer()
+    {
+        AssertEqual(3, "int main() { int x=3; return *&x; }");
+        AssertEqual(3, "int main() { int x=3; int y=&x; int z=&y; return **z; }");
+        // AssertEqual(5, "int main() { int x=3; int y=5; return *(&x+1); }");
+        // AssertEqual(3, "int main() { int x=3; int y=5; return *(&y-1); }");
+        AssertEqual(5, "int main() { int x=3; int *y=&x; *y=5; return x; }");
+        // AssertEqual(7, "int main() { int x=3; int y=5; *(&x+1)=7; return y; }");
+        // AssertEqual(7, "int main() { int x=3; int y=5; *(&y-1)=7; return x; }");
+    }
+
     private void AssertEqual(int expect, string code)
     {
         var path = Write(Compiler.Compile(code));

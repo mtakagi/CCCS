@@ -345,6 +345,14 @@ namespace CCCS
             {
                 return new Node(NodeKind.Sub, new Node(0), this.Primary());
             }
+            else if (this.lexer.Consume("&"))
+            {
+                return new Node(NodeKind.Address, this.Unary(), null);
+            }
+            else if (this.lexer.Consume("*"))
+            {
+                return new Node(NodeKind.Dereference, this.Unary(), null);
+            }
             else
             {
                 return this.Primary();

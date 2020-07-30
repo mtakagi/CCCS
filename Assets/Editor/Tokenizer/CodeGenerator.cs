@@ -11,12 +11,15 @@ namespace CCCS
 
         private static string GenLVar(Node node)
         {
-            if (node.Kind != NodeKind.LeftVariable)
+            switch (node.Kind)
             {
-                throw new System.Exception();
+                case NodeKind.LeftVariable:
+                    return $"  mov rax, rbp\n  sub rax, {node.Offset}\n  push rax\n";
+                case NodeKind.Dereference:
+                    return CodeGen(node.Lhs);
+                default:
+                    throw new System.Exception();
             }
-
-            return $"  mov rax, rbp\n  sub rax, {node.Offset}\n  push rax\n";
         }
 
         public static string CodeGen(Node node, string funcname = "")
@@ -37,6 +40,10 @@ namespace CCCS
                     return $"{GenLVar(node)}  pop rax\n  mov rax, [rax]\n  push rax\n";
                 case NodeKind.Assign:
                     return $"{GenLVar(node.Lhs)}{CodeGen(node.Rhs)}  pop rdi\n  pop rax\n  mov [rax], rdi\n  push rdi\n";
+                case NodeKind.Address:
+                    return GenLVar(node.Lhs);
+                case NodeKind.Dereference:
+                    return $"{CodeGen(node.Lhs)}  pop rax\n  mov rax, [rax]\n  push rax\n";
                 case NodeKind.IF:
                     {
                         var builder = new System.Text.StringBuilder();
