@@ -170,9 +170,17 @@ namespace CCCS
             switch (node.Kind)
             {
                 case NodeKind.Add:
+                    if (node.Type.Kind == TypeKind.Pointer)
+                    {
+                        sb.Append("  imul rdi, 8\n");
+                    }
                     sb.Append("  add rax, rdi\n");
                     break;
                 case NodeKind.Sub:
+                    if (node.Type.Kind == TypeKind.Pointer)
+                    {
+                        sb.Append("  imul rdi, 8\n");
+                    }
                     sb.Append("  sub rax, rdi\n");
                     break;
                 case NodeKind.Mul:
