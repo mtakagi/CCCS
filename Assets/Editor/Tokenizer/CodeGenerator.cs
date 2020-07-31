@@ -27,8 +27,12 @@ namespace CCCS
             }
             switch (node.Kind)
             {
+                case NodeKind.Null:
+                    return "";
                 case NodeKind.Nunber:
                     return $"  push {node.IntValue}\n";
+                case NodeKind.ExpressionStatement:
+                    return $"{CodeGen(node.Lhs)}  add rsp, 8\n";
                 case NodeKind.LeftVariable:
                     return $"{GenLVar(node)}  pop rax\n  mov rax, [rax]\n  push rax\n";
                 case NodeKind.Assign:

@@ -11,6 +11,17 @@ namespace CCCS
             this.token = token;
         }
 
+        public Token Peek(string s)
+        {
+            if (token.Kind != TokenKind.Reserved || s != token.StrValue
+                    || s.Length != token.Length || s != token.StrValue)
+            {
+                return null;
+            }
+
+            return token;
+        }
+
         public bool Consume(string op)
         {
             if (token.Kind != TokenKind.Reserved || op != token.StrValue

@@ -26,17 +26,42 @@ namespace CCCS
             }
         }
 
-        public LocalVariable ParameterDeclaration(string name)
+        public LocalVariable ParameterDeclaration(string name, Type type)
         {
             var val = new LocalVariable(name, 0);
             var list = new VariableList();
 
+            val.Type = type;
             list.Var = val;
             list.Next = this.Locals;
 
             this.Locals = list;
 
             return val;
+        }
+
+        public Type BaseType()
+        {
+            this.lexer.Expect("int");
+            var type = Type.IntType;
+
+            while (this.lexer.Consume("*"))
+            {
+                type = Type.PointerTo(type);
+            }
+
+            return type;
+        }
+
+        public VariableList FunctionParam()
+        {
+            var list = new VariableList();
+            var type = this.BaseType();
+            var token = this.lexer.ConsumeIdentifier();
+
+            list.Var = this.ParameterDeclaration(token.StrValue, type);
+
+            return list;
         }
 
         public VariableList ParameterList()
@@ -46,18 +71,14 @@ namespace CCCS
                 return null;
             }
 
-            var token = this.lexer.ConsumeIdentifier();
-            var head = new VariableList();
+            var head = this.FunctionParam();
             var cur = head;
 
-            head.Var = this.ParameterDeclaration(token.StrValue);
 
             while (!this.lexer.Consume(")"))
             {
                 this.lexer.Expect(",");
-                token = this.lexer.ConsumeIdentifier();
-                cur.Next = new VariableList();
-                cur.Next.Var = this.ParameterDeclaration(token.StrValue);
+                cur.Next = this.FunctionParam();
                 cur = cur.Next;
             }
 
@@ -66,13 +87,16 @@ namespace CCCS
 
         public Function Function()
         {
-            var token = this.lexer.ConsumeIdentifier();
             var node = new Node();
             var func = new Function();
 
             var head = node;
 
             this.Locals = null;
+            this.BaseType();
+
+            var token = this.lexer.ConsumeIdentifier();
+
             this.lexer.Expect("(");
             func.Params = this.ParameterList();
             this.lexer.Expect("{");
@@ -90,6 +114,29 @@ namespace CCCS
             func.Locals = this.Locals;
 
             return func;
+        }
+
+        public Node Declaration()
+        {
+            var token = this.lexer.token;
+            var type = this.BaseType();
+            var val = this.ParameterDeclaration(this.lexer.ConsumeIdentifier().StrValue, type);
+
+            if (this.lexer.Consume(";"))
+            {
+                return new Node(NodeKind.Null);
+            }
+
+            this.lexer.Expect("=");
+
+            var lhs = new Node(val);
+            var rhs = this.Expr();
+
+            this.lexer.Expect(";");
+
+            var node = new Node(NodeKind.Assign, lhs, rhs);
+
+            return new Node(NodeKind.ExpressionStatement, node, null);
         }
 
         public Node Statement()
@@ -165,10 +212,15 @@ namespace CCCS
 
                 return node;
             }
+            else if (this.lexer.Peek("int") != null)
+            {
+                return this.Declaration();
+            }
             else
             {
                 node = this.Expr();
             }
+
             this.lexer.Expect(";");
 
             return node;
@@ -342,7 +394,8 @@ namespace CCCS
 
                 if (local == null)
                 {
-                    local = this.ParameterDeclaration(token.StrValue);
+                    // local = this.ParameterDeclaration(token.StrValue);
+                    throw new System.Exception();
                 }
                 node = new Node(local);
 

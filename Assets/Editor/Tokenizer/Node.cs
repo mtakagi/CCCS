@@ -69,6 +69,11 @@
             this.Then = then;
         }
 
+        public Node(NodeKind kind)
+        {
+            this.Kind = kind;
+        }
+
         public Node()
         {
             this.Kind = NodeKind.Body;
