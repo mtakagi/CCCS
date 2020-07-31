@@ -107,6 +107,7 @@ namespace CCCS
                 return;
             }
 
+            AddType(node.Next);
             AddType(node.Lhs);
             AddType(node.Rhs);
             AddType(node.Cond);
@@ -142,6 +143,9 @@ namespace CCCS
                 case NodeKind.LeftVariable:
                     node.Type = Type.IntType;
                     return;
+                // case NodeKind.Body:
+                //     AddType(node.Next);
+                // return;
                 // case ND_TERNARY:
                 //     node->ty = node->then->ty;
                 //     return;
