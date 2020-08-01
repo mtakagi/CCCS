@@ -27,8 +27,12 @@ namespace CCCS
             }
             switch (node.Kind)
             {
+                case NodeKind.Null:
+                    return "";
                 case NodeKind.Nunber:
                     return $"  push {node.IntValue}\n";
+                case NodeKind.ExpressionStatement:
+                    return $"{CodeGen(node.Lhs)}  add rsp, 8\n";
                 case NodeKind.LeftVariable:
                     return $"{GenLVar(node)}  pop rax\n  mov rax, [rax]\n  push rax\n";
                 case NodeKind.Assign:
@@ -170,9 +174,17 @@ namespace CCCS
             switch (node.Kind)
             {
                 case NodeKind.Add:
+                    if (node.Type.Kind == TypeKind.Pointer)
+                    {
+                        sb.Append("  imul rdi, 8\n");
+                    }
                     sb.Append("  add rax, rdi\n");
                     break;
                 case NodeKind.Sub:
+                    if (node.Type.Kind == TypeKind.Pointer)
+                    {
+                        sb.Append("  imul rdi, 8\n");
+                    }
                     sb.Append("  sub rax, rdi\n");
                     break;
                 case NodeKind.Mul:

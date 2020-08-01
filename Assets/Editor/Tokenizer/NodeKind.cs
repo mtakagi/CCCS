@@ -18,6 +18,8 @@
         For,
         Body,
         FunctionCall,
-        Return
+        Return,
+        Null,
+        ExpressionStatement
     }
 }

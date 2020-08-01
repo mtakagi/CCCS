@@ -24,6 +24,8 @@
 
         public Node Args { get; internal set; }
 
+        public Type Type { get; internal set; }
+
         public Node(NodeKind kind, Node lhs, Node rhs)
         {
             this.Kind = kind;
@@ -65,6 +67,11 @@
             this.Cond = cond;
             this.Inc = inc;
             this.Then = then;
+        }
+
+        public Node(NodeKind kind)
+        {
+            this.Kind = kind;
         }
 
         public Node()

@@ -15,6 +15,7 @@ namespace CCCS
             var sb = new StringBuilder();
 
             parser.Program();
+            Type.AddType(parser.Func);
 
             foreach (var func in parser.Func)
             {
