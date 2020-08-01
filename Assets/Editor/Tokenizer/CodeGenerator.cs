@@ -9,7 +9,7 @@ namespace CCCS
         private static int labelseq = 1;
         private static string functionname = "";
 
-        private static string GenLVar(Node node)
+        private static string GenAddress(Node node)
         {
             switch (node.Kind)
             {
@@ -20,6 +20,21 @@ namespace CCCS
                 default:
                     throw new System.Exception();
             }
+        }
+
+        private static string GenLVar(Node node)
+        {
+            if (node.Type.Kind == TypeKind.Array)
+            {
+                throw new System.Exception();
+            }
+
+            return GenAddress(node);
+        }
+
+        private static string GenLoad()
+        {
+            return "  pop rax\n  mov rax, [rax]\n  push rax\n";
         }
 
         public static string CodeGen(Node node, string funcname = "")
@@ -37,13 +52,27 @@ namespace CCCS
                 case NodeKind.ExpressionStatement:
                     return $"{CodeGen(node.Lhs)}  add rsp, 8\n";
                 case NodeKind.LeftVariable:
-                    return $"{GenLVar(node)}  pop rax\n  mov rax, [rax]\n  push rax\n";
+                    if (node.Type.Kind != TypeKind.Array)
+                    {
+                        return $"{GenAddress(node)}{GenLoad()}";
+                    }
+                    else
+                    {
+                        return GenAddress(node);
+                    }
                 case NodeKind.Assign:
                     return $"{GenLVar(node.Lhs)}{CodeGen(node.Rhs)}  pop rdi\n  pop rax\n  mov [rax], rdi\n  push rdi\n";
                 case NodeKind.Address:
                     return GenLVar(node.Lhs);
                 case NodeKind.Dereference:
-                    return $"{CodeGen(node.Lhs)}  pop rax\n  mov rax, [rax]\n  push rax\n";
+                    if (node.Type.Kind != TypeKind.Array)
+                    {
+                        return $"{CodeGen(node.Lhs)}{GenLoad()}";
+                    }
+                    else
+                    {
+                        return CodeGen(node.Lhs);
+                    }
                 case NodeKind.IF:
                     {
                         var builder = new System.Text.StringBuilder();
@@ -181,16 +210,16 @@ namespace CCCS
             switch (node.Kind)
             {
                 case NodeKind.Add:
-                    if (node.Type.Kind == TypeKind.Pointer)
+                    if (node.Type.BaseType != null)
                     {
-                        sb.Append("  imul rdi, 8\n");
+                        sb.Append($"  imul rdi, {node.Type.BaseType.Size}\n");
                     }
                     sb.Append("  add rax, rdi\n");
                     break;
                 case NodeKind.Sub:
-                    if (node.Type.Kind == TypeKind.Pointer)
+                    if (node.Type.BaseType != null)
                     {
-                        sb.Append("  imul rdi, 8\n");
+                        sb.Append($"  imul rdi, {node.Type.BaseType.Size}\n");
                     }
                     sb.Append("  sub rax, rdi\n");
                     break;

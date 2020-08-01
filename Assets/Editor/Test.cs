@@ -177,6 +177,23 @@ public class CCCSTest
         // AssertEqual(7, "int main() { int x=3; int y=5; *(&y-1)=7; return x; }");
     }
 
+    [Test]
+    public void テストArray()
+    {
+        AssertEqual(3, "int main() { int x[2]; int *y=&x; *y=3; return *x; }");
+        // AssertEqual(3, "int main() { int x[3]; *x=3; *(x+1)=4; *(x+2)=5; return *x; }");
+        // AssertEqual(4, "int main() { int x[3]; *x=3; *(x+1)=4; *(x+2)=5; return *(x+1); }");
+        // AssertEqual(5, "int main() { int x[3]; *x=3; *(x+1)=4; *(x+2)=5; return *(x+2); }");
+
+        // AssertEqual(0, "int main() { int x[2][3]; int *y=x; *y=0; return **x; }");
+        // AssertEqual(1, "int main() { int x[2][3]; int *y=x; *(y+1)=1; return *(*x+1); }");
+        // AssertEqual(2, "int main() { int x[2][3]; int *y=x; *(y+2)=2; return *(*x+2); }");
+        // AssertEqual(3, "int main() { int x[2][3]; int *y=x; *(y+3)=3; return **(x+1); }");
+        // AssertEqual(4, "int main() { int x[2][3]; int *y=x; *(y+4)=4; return *(*(x+1)+1); }");
+        // AssertEqual(5, "int main() { int x[2][3]; int *y=x; *(y+5)=5; return *(*(x+1)+2); }");
+        // AssertEqual(6, "int main() { int x[2][3]; int *y=x; *(y+6)=6; return **(x+2); }");
+    }
+
     private void AssertEqual(int expect, string code)
     {
         var path = Write(Compiler.Compile(code));
