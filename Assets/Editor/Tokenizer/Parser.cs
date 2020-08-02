@@ -372,8 +372,22 @@ namespace CCCS
             }
             else
             {
-                return this.Primary();
+                return this.Postfix();
             }
+        }
+
+        public Node Postfix()
+        {
+            var node = this.Primary();
+
+            while (this.lexer.Consume("["))
+            {
+                var exp = new Node(NodeKind.Add, node, this.Expr());
+                this.lexer.Expect("]");
+                node = new Node(NodeKind.Dereference, exp, null);
+            }
+
+            return node;
         }
 
         public Node Primary()
