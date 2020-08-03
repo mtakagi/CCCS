@@ -59,6 +59,7 @@ namespace CCCS
             var type = this.BaseType();
             var token = this.lexer.ConsumeIdentifier();
 
+            type = this.TypeSuffix(type);
             list.Var = this.ParameterDeclaration(token.StrValue, type);
 
             return list;
@@ -83,6 +84,20 @@ namespace CCCS
             }
 
             return head;
+        }
+
+        public Type TypeSuffix(Type basetype)
+        {
+            if (!this.lexer.Consume("["))
+            {
+                return basetype;
+            }
+
+            var size = this.lexer.ExpectNumber();
+            this.lexer.Expect("]");
+            basetype = this.TypeSuffix(basetype);
+
+            return Type.ArrayOf(basetype, size);
         }
 
         public Function Function()
@@ -119,8 +134,10 @@ namespace CCCS
         public Node Declaration()
         {
             var token = this.lexer.token;
-            var type = this.BaseType();
-            var val = this.ParameterDeclaration(this.lexer.ConsumeIdentifier().StrValue, type);
+            var basetype = this.BaseType();
+            var id = this.lexer.ConsumeIdentifier();
+            var type = this.TypeSuffix(basetype);
+            var val = this.ParameterDeclaration(id.StrValue, type);
 
             if (this.lexer.Consume(";"))
             {
@@ -345,10 +362,32 @@ namespace CCCS
             {
                 return new Node(NodeKind.Sub, new Node(0), this.Primary());
             }
+            else if (this.lexer.Consume("&"))
+            {
+                return new Node(NodeKind.Address, this.Unary(), null);
+            }
+            else if (this.lexer.Consume("*"))
+            {
+                return new Node(NodeKind.Dereference, this.Unary(), null);
+            }
             else
             {
-                return this.Primary();
+                return this.Postfix();
             }
+        }
+
+        public Node Postfix()
+        {
+            var node = this.Primary();
+
+            while (this.lexer.Consume("["))
+            {
+                var exp = new Node(NodeKind.Add, node, this.Expr());
+                this.lexer.Expect("]");
+                node = new Node(NodeKind.Dereference, exp, null);
+            }
+
+            return node;
         }
 
         public Node Primary()

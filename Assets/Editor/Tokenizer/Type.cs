@@ -141,7 +141,7 @@ namespace CCCS
                     node.Type = node.Lhs.Type;
                     return;
                 case NodeKind.LeftVariable:
-                    node.Type = Type.IntType;
+                    node.Type = node.Var.Type;
                     return;
                 // case NodeKind.Body:
                 //     AddType(node.Next);
@@ -155,25 +155,38 @@ namespace CCCS
                 // case ND_MEMBER:
                 //     node->ty = node->member->ty;
                 //     return;
-                // case NodeKind.Address:
-                //     if (node.Lhs.Type.kind == TypeKind.Array)
-                //         node.Type = PointerTo(node.Lhs.Type.BaseType);
-                //     else
-                //         node.Type = PointerTo(node.Lhs.Type);
-                //     return;
-                //             case NodeKind.Derefrence:
-                //                 {
-                //                     if (!node->lhs->ty->base)
-                // //   error_tok(node->tok, "invalid pointer dereference");
+                case NodeKind.Address:
+                    if (node.Lhs.Type.Kind == TypeKind.Array)
+                    {
+                        node.Type = PointerTo(node.Lhs.Type.BaseType);
+                    }
+                    else
+                    {
+                        node.Type = PointerTo(node.Lhs.Type);
+                    }
+                    return;
+                case NodeKind.Dereference:
+                    {
+                        if (node.Lhs.Type.BaseType == null)
+                        {
+                            //   error_tok(node->tok, "invalid pointer dereference");
+                            throw new System.Exception();
+                        }
 
-                //                     Type ty = node.Lhs.Type.BaseType;
-                //                     if (Type.Kind == TypeKind.Void)
-                //                         // error_tok(node->tok, "dereferencing a void pointer");
-                //                         if (ty.kind == TypeKind.Struct && ty.IsIncomplete)
-                //                             // error_tok(node->tok, "incomplete struct type");
-                //                             node.Type = ty;
-                //                     return;
-                //                 }
+                        Type type = node.Lhs.Type.BaseType;
+                        if (type.Kind == TypeKind.Void)
+                        {
+                            // error_tok(node->tok, "dereferencing a void pointer");
+                            throw new System.Exception();
+                        }
+                        if (type.Kind == TypeKind.Struct && type.IsIncomplete)
+                        {
+                            // error_tok(node->tok, "incomplete struct type");
+                            throw new System.Exception();
+                        }
+                        node.Type = type;
+                        return;
+                    }
                 // case ND_STMT_EXPR:
                 //     {
                 //         Node* last = node->body;

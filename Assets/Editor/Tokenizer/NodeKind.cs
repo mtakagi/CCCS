@@ -1,4 +1,4 @@
-﻿namespace CCCS
+namespace CCCS
 {
     public enum NodeKind
     {
@@ -18,8 +18,10 @@
         For,
         Body,
         FunctionCall,
-        Return,
         Null,
-        ExpressionStatement
+        ExpressionStatement,
+        Address,
+        Dereference,
+        Return
     }
 }
