@@ -63,7 +63,7 @@ namespace CCCS
                 case NodeKind.Assign:
                     return $"{GenLVar(node.Lhs)}{CodeGen(node.Rhs)}  pop rdi\n  pop rax\n  mov [rax], rdi\n  push rdi\n";
                 case NodeKind.Address:
-                    return GenLVar(node.Lhs);
+                    return GenAddress(node.Lhs);
                 case NodeKind.Dereference:
                     if (node.Type.Kind != TypeKind.Array)
                     {
